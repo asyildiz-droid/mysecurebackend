@@ -41,7 +41,23 @@ public class Environment2DController : ControllerBase
     [HttpPost(Name = "AddEnvironment2D")]
     public async Task<ActionResult<Environment2D>> AddAsync(Environment2D environment2D)
     {
+        // AC1 - Gebruiker moet ingelogd zijn
+        var userId = _authenticationService.GetCurrentAuthenticatedUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(new ProblemDetails { Detail = "Gebruiker niet ingelogd" });
+
+        // AC2 - Maximum van 5 eigen 2D-werelden
+        var userEnvironments = await _environment2DRepository.SelectByUserIdAsync(userId);
+        if (userEnvironments.Count() >= 5)
+            return BadRequest(new ProblemDetails { Detail = "Maximum aantal 2D-werelden bereikt" });
+
+        // AC3 - Naam moet uniek zijn per gebruiker
+        var existingEnvironment = await _environment2DRepository.SelectByUserIdAndNameAsync(userId, environment2D.Name);
+        if (existingEnvironment != null)
+            return Conflict(new ProblemDetails { Detail = "Naam bestaat al" });
+
         environment2D.Id = Guid.NewGuid();
+        environment2D.UserId = userId;
 
         await _environment2DRepository.InsertAsync(environment2D);
 

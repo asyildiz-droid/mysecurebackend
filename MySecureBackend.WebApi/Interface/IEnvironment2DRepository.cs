@@ -9,5 +9,7 @@ namespace MySecureBackend.WebApi.Interface
         Task<IEnumerable<Environment2D>> SelectAsync();
         Task<Environment2D?> SelectAsync(Guid id);
         Task UpdateAsync(Environment2D environment2D);
+        Task<IEnumerable<Environment2D>> SelectByUserIdAsync(string userId);
+        Task<Environment2D?> SelectByUserIdAndNameAsync(string userId, string name);
     }
 }

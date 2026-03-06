@@ -18,7 +18,7 @@ namespace MySecureBackend.WebApi.Repositories
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-               await sqlConnection.ExecuteAsync("INSERT INTO [Environment2D] (Id, Name, MaxHeight, MaxLength) VALUES (@Id, @Name, @MaxHeight, @MaxLength)", environment2D);
+                await sqlConnection.ExecuteAsync("INSERT INTO [Environment2D] (Id, Name, MaxHeight, MaxLength, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxLength, @UserId)", environment2D);
             }
         }
 
@@ -26,7 +26,7 @@ namespace MySecureBackend.WebApi.Repositories
         {
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
-                return await sqlConnection.QuerySingleOrDefaultAsync<Environment2D>("SELECT * FROM [Environment2D] WHERE Id = @Id", new { id });   
+                return await sqlConnection.QuerySingleOrDefaultAsync<Environment2D>("SELECT * FROM [Environment2D] WHERE Id = @Id", new { id });
             }
         }
 
@@ -45,7 +45,8 @@ namespace MySecureBackend.WebApi.Repositories
                 await sqlConnection.ExecuteAsync("UPDATE [Environment2D] SET " +
                                                  "Name = @Name, " +
                                                  "MaxHeight = @MaxHeight, " +
-                                                 "MaxLength = @MaxLength " +
+                                                 "MaxLength = @MaxLength, " +
+                                                 "UserId = @UserId " +
                                                  "WHERE Id = @Id", environment2D);
 
             }
@@ -56,6 +57,26 @@ namespace MySecureBackend.WebApi.Repositories
             using (var sqlConnection = new SqlConnection(sqlConnectionString))
             {
                 await sqlConnection.ExecuteAsync("DELETE FROM [Environment2D] WHERE Id = @Id", new { id });
+            }
+        }
+
+        public async Task<IEnumerable<Environment2D>> SelectByUserIdAsync(string userId)
+        {
+            using (var sqlConnection = new SqlConnection(sqlConnectionString))
+            {
+                return await sqlConnection.QueryAsync<Environment2D>(
+                    "SELECT * FROM [Environment2D] WHERE UserId = @UserId",
+                    new { UserId = userId });
+            }
+        }
+
+        public async Task<Environment2D?> SelectByUserIdAndNameAsync(string userId, string name)
+        {
+            using (var sqlConnection = new SqlConnection(sqlConnectionString))
+            {
+                return await sqlConnection.QuerySingleOrDefaultAsync<Environment2D>(
+                    "SELECT * FROM [Environment2D] WHERE UserId = @UserId AND Name = @Name",
+                    new { UserId = userId, Name = name });
             }
         }
     }

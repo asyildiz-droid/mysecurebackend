@@ -1,4 +1,4 @@
-# MySecureBackend - Starter Template
+﻿# MySecureBackend - Starter Template
 
 A robust REST API built with .NET 10 (C#), utilizing a SQL database for persistence and designed with integrated unit testing support.
 
@@ -28,3 +28,6 @@ This solution is part of the 'Secure Backend' lessons, where you'll explore the 
 - The integrated workflow is an example for students, but is deactivated within this GitHub repository
 
 ---
+
+## ✅ CI/CD Status
+Automated testing is enabled via GitHub Actions.

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySecureBackend.WebApi", "MySecureBackend.WebApi\MySecureBackend.WebApi.csproj", "{977C502C-8275-4B1D-820E-3FE0E2059658}"
 EndProject
@@ -12,6 +12,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		.sql\database_creation_script.sql = .sql\database_creation_script.sql
 		.github\workflows\github_workflow_simplified.yaml = .github\workflows\github_workflow_simplified.yaml
 		readme.md = readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FFB894FD-C853-43D1-8B1A-E19382B197DD}"
+	ProjectSection(SolutionItems) = preProject
+		SystemTests.md = SystemTests.md
 	EndProjectSection
 EndProject
 Global

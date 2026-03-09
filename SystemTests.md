@@ -28,7 +28,7 @@ Een nieuwe gebruiker moet zich kunnen registreren met email en wachtwoord.
 
 **Screenshot:** [PLAK HIER]
 
-**Resultaat:** ☐ PASS / ☐ FAIL
+**Resultaat:** ☑ PASS
 
 ---
 

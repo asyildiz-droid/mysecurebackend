@@ -108,3 +108,5 @@ app.MapGroup("/account").MapIdentityApi<IdentityUser>().WithTags("Account");
 app.MapControllers();
 
 app.Run();
+
+// For integration testing purposes

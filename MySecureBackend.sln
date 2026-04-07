@@ -10,7 +10,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{F874DEB3-668D-4F21-AB84-491F1649FEBC}"
 	ProjectSection(SolutionItems) = preProject
 		.sql\database_creation_script.sql = .sql\database_creation_script.sql
-		.github\workflows\github_workflow_simplified.yaml = .github\workflows\github_workflow_simplified.yaml
 		readme.md = readme.md
 	EndProjectSection
 EndProject

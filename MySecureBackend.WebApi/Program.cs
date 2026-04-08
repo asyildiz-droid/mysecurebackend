@@ -3,6 +3,7 @@ using Microsoft.OpenApi;
 using MySecureBackend.WebApi.Interface;
 using MySecureBackend.WebApi.Repositories;
 using MySecureBackend.WebApi.Services;
+using Npgsql;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,9 @@ builder.Services.AddControllers();
 var sqlConnectionString = builder.Configuration.GetValue<string>("SqlConnectionString");
 var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString);
 
+using var conn = new NpgsqlConnection(sqlConnectionString); 
+conn.Open(); 
+Console.WriteLine("✅ Database connected!");
 // ✅ NIEUW: CORS toevoegen voor Unity
 builder.Services.AddCors(options =>
 {

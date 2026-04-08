@@ -10,39 +10,30 @@ namespace MySecureBackend.WebApi.Repositories
         private readonly string _connectionString;
 
         public UserRepository(string connectionString)
-
         {
-
             _connectionString = connectionString;
-
         }
+
         public async Task<User?> GetByUserName(string userName)
-
         {
-
             using var conn = new NpgsqlConnection(_connectionString);
-
-
             return await conn.QueryFirstOrDefaultAsync<User>(
-
                 "SELECT * FROM \"User\" WHERE \"UserName\" = @UserName",
-
                 new { UserName = userName });
-
         }
+
         public async Task Create(User user)
-
         {
-
             using var conn = new NpgsqlConnection(_connectionString);
-
-
+            
+            // Omdat de database het Id (int) zelf optelt, sturen we alleen UserName en PasswordHash mee
             await conn.ExecuteAsync(
-
                 "INSERT INTO \"User\" (\"UserName\", \"PasswordHash\") VALUES (@UserName, @PasswordHash)",
-
-                user);
-
+                new
+                {
+                    UserName = user.UserName,
+                    PasswordHash = user.PasswordHash
+                });
         }
     }
 }

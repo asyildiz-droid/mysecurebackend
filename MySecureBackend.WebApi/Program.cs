@@ -67,6 +67,7 @@ builder.Services.AddTransient<IAuthenticationService, AspNetIdentityAuthenticati
 // Register application repositories.
 builder.Services.AddTransient<IEnvironment2DRepository, SqlEnvironment2DRepository>(o => new SqlEnvironment2DRepository(sqlConnectionString!));
 builder.Services.AddTransient<IObject2DRepository, SqlObject2DRepository>(o => new SqlObject2DRepository(sqlConnectionString!));
+builder.Services.AddTransient<IUserRepository, UserRepository>(o => new UserRepository(sqlConnectionString!));
 
 var app = builder.Build();
 
@@ -109,7 +110,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // Register Identity endpoints for account management.
-app.MapGroup("/account").MapIdentityApi<IdentityUser>().WithTags("Account");
+//app.MapGroup("/account").MapIdentityApi<IdentityUser>().WithTags("Account");
 
 // Register all controller endpoints for the application.
 app.MapControllers();

@@ -9,7 +9,7 @@ namespace MySecureBackend.WebApi.Controllers
 {
     [ApiController]
 
-    [Route("users")]
+    [Route("api/users")]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;

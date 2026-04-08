@@ -65,9 +65,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAuthenticationService, AspNetIdentityAuthenticationService>();
 
 // Register application repositories.
+builder.Services.AddSingleton<IUserRepository>(sp => new UserRepository(builder.Configuration.GetValue<string>("SqlConnectionString")));
 builder.Services.AddTransient<IEnvironment2DRepository, SqlEnvironment2DRepository>(o => new SqlEnvironment2DRepository(sqlConnectionString!));
 builder.Services.AddTransient<IObject2DRepository, SqlObject2DRepository>(o => new SqlObject2DRepository(sqlConnectionString!));
-builder.Services.AddTransient<IUserRepository, UserRepository>(o => new UserRepository(sqlConnectionString!));
+
 
 var app = builder.Build();
 

@@ -3,15 +3,15 @@ using MySecureBackend.WebApi.Interface;
 using MySecureBackend.WebApi.Repositories;
 using MySecureBackend.WebApi.Services;
 
+// The de Builder! We The THE poort direct the via Kestrel options.
 var builder = WebApplication.CreateBuilder(args);
 
-// Dwing de poort af vóórdat er ook maar IETS anders gebouwd wordt.
-// ✅ GEFIXT: Gebruik deze truc ALLEEN the productie! Lokaal laat Visual Studio het met rust.
-if (!builder.Environment.IsDevelopment())
+// ✅ GEFIXT: Dit the Render's Port Scan The the the direct!
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+builder.WebHost.ConfigureKestrel(options =>
 {
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-    builder.WebHost.UseUrls($"http://*:{port}");
-}
+    options.ListenAnyIP(int.Parse(port)); // De absolute strakste manier in .NET!
+});
 
 // Register MVC controllers for handling HTTP requests.
 builder.Services.AddControllers();
@@ -42,11 +42,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
-
-// Register authorization services
 builder.Services.AddAuthorization();
-
-// Register IHttpContextAccessor for accessing HTTP context in services.
 builder.Services.AddHttpContextAccessor();
 
 // Onze Services & Repositories registreren (gekoppeld aan Postgres!)
@@ -77,20 +73,13 @@ else
     var buildTimeStamp = System.IO.File.GetCreationTime(System.Reflection.Assembly.GetExecutingAssembly().Location);
     string currentHealthMessage = $"The API is up 🚀 | Connection string found: {(sqlConnectionStringFound ? "✅" : "❌")} | Build timestamp: {buildTimeStamp}";
 
-    // ✅ GEFIXT: Map in plaats van MapGet (voorkomt 405 Method Not Supported op de Render HealthCheck)
+    // ✅ GEFIXT: Map endpoint the ook The the the de Render Health check The!
     app.Map("/", () => currentHealthMessage);
 }
 
 // ✅ NIEUW: CORS middleware
 app.UseCors("AllowUnity");
-
-// Enforce HTTPS for all requests.
 app.UseHttpsRedirection();
-
-// Enable authorization middleware.
 app.UseAuthorization();
-
-// Register all controller endpoints for the application.
 app.MapControllers();
-
 app.Run();

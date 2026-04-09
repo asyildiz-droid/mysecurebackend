@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MySecureBackend.WebApi.Interface;
 using MySecureBackend.WebApi.Models;
-using MySecureBackend.WebApi.Services;
 
 namespace MySecureBackend.WebApi.Controllers;
 
@@ -12,12 +11,10 @@ namespace MySecureBackend.WebApi.Controllers;
 public class Object2DController : ControllerBase
 {
     private readonly IObject2DRepository _object2DRepository;
-    private readonly IAuthenticationService _authenticationService;
 
-    public Object2DController(IObject2DRepository object2DRepository, IAuthenticationService authenticationService)
+    public Object2DController(IObject2DRepository object2DRepository)
     {
         _object2DRepository = object2DRepository;
-        _authenticationService = authenticationService;
     }
 
     [HttpGet(Name = "GetObject2D")]
@@ -42,7 +39,6 @@ public class Object2DController : ControllerBase
     public async Task<ActionResult<Object2D>> AddAsync(Object2D object2D)
     {
         object2D.Id = Guid.NewGuid();
-
         await _object2DRepository.InsertAsync(object2D);
 
         return CreatedAtRoute("GetObject2DById", new { object2DId = object2D.Id }, object2D);
@@ -52,15 +48,10 @@ public class Object2DController : ControllerBase
     public async Task<ActionResult<Object2D>> UpdateAsync(Guid object2DId, Object2D object2D)
     {
         var existingObject2D = await _object2DRepository.SelectAsync(object2DId);
-
-        if (existingObject2D == null)
-            return NotFound(new ProblemDetails { Detail = $"Object2D {object2DId} not found" });
-
-        if (object2D.Id != object2DId)
-            return Conflict(new ProblemDetails { Detail = "The id of the Object2D in the route does not match the id of the Object2D in the body" });
+        if (existingObject2D == null) return NotFound(new ProblemDetails { Detail = $"Object2D {object2DId} not found" });
+        if (object2D.Id != object2DId) return Conflict(new ProblemDetails { Detail = "The id mismatch" });
 
         await _object2DRepository.UpdateAsync(object2D);
-
         return Ok(object2D);
     }
 
@@ -68,12 +59,9 @@ public class Object2DController : ControllerBase
     public async Task<ActionResult> DeleteAsync(Guid object2DId)
     {
         var object2D = await _object2DRepository.SelectAsync(object2DId);
-
-        if (object2D == null)
-            return NotFound(new ProblemDetails { Detail = $"Object2D {object2DId} not found" });
+        if (object2D == null) return NotFound(new ProblemDetails { Detail = $"Object2D {object2DId} not found" });
 
         await _object2DRepository.DeleteAsync(object2DId);
-
         return Ok();
     }
 }

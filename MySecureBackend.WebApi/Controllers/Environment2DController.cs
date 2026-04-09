@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MySecureBackend.WebApi.Interface;
 using MySecureBackend.WebApi.Models;
-using MySecureBackend.WebApi.Services;
 
 namespace MySecureBackend.WebApi.Controllers;
 
@@ -12,12 +11,10 @@ namespace MySecureBackend.WebApi.Controllers;
 public class Environment2DController : ControllerBase
 {
     private readonly IEnvironment2DRepository _environment2DRepository;
-    private readonly IAuthenticationService _authenticationService;
 
-    public Environment2DController(IEnvironment2DRepository environment2DRepository, IAuthenticationService authenticationService)
+    public Environment2DController(IEnvironment2DRepository environment2DRepository)
     {
         _environment2DRepository = environment2DRepository;
-        _authenticationService = authenticationService;
     }
 
     [HttpGet(Name = "GetEnvironment2D")]
@@ -41,23 +38,18 @@ public class Environment2DController : ControllerBase
     [HttpPost(Name = "AddEnvironment2D")]
     public async Task<ActionResult<Environment2D>> AddAsync(Environment2D environment2D)
     {
-        // AC1 - Gebruiker moet ingelogd zijn
-        var userId = _authenticationService.GetCurrentAuthenticatedUserId();
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized(new ProblemDetails { Detail = "Gebruiker niet ingelogd" });
+        if (string.IsNullOrEmpty(environment2D.UserId))
+            return Unauthorized(new ProblemDetails { Detail = "Gebruiker niet meegegeven" });
 
-        // AC2 - Maximum van 5 eigen 2D-werelden
-        var userEnvironments = await _environment2DRepository.SelectByUserIdAsync(userId);
+        var userEnvironments = await _environment2DRepository.SelectByUserIdAsync(environment2D.UserId);
         if (userEnvironments.Count() >= 5)
             return BadRequest(new ProblemDetails { Detail = "Maximum aantal 2D-werelden bereikt" });
 
-        // AC3 - Naam moet uniek zijn per gebruiker
-        var existingEnvironment = await _environment2DRepository.SelectByUserIdAndNameAsync(userId, environment2D.Name);
+        var existingEnvironment = await _environment2DRepository.SelectByUserIdAndNameAsync(environment2D.UserId, environment2D.Name);
         if (existingEnvironment != null)
             return Conflict(new ProblemDetails { Detail = "Naam bestaat al" });
 
         environment2D.Id = Guid.NewGuid();
-        environment2D.UserId = userId;
 
         await _environment2DRepository.InsertAsync(environment2D);
 
@@ -68,15 +60,10 @@ public class Environment2DController : ControllerBase
     public async Task<ActionResult<Environment2D>> UpdateAsync(Guid environment2DId, Environment2D environment2D)
     {
         var existingEnvironment2D = await _environment2DRepository.SelectAsync(environment2DId);
-
-        if (existingEnvironment2D == null)
-            return NotFound(new ProblemDetails { Detail = $"Environment2D {environment2DId} not found" });
-
-        if (environment2D.Id != environment2DId)
-            return Conflict(new ProblemDetails { Detail = "The id of the Environment2D in the route does not match the id of the Environment2D in the body" });
+        if (existingEnvironment2D == null) return NotFound(new ProblemDetails { Detail = $"Environment2D {environment2DId} not found" });
+        if (environment2D.Id != environment2DId) return Conflict(new ProblemDetails { Detail = "The id mismatch" });
 
         await _environment2DRepository.UpdateAsync(environment2D);
-
         return Ok(environment2D);
     }
 
@@ -84,12 +71,9 @@ public class Environment2DController : ControllerBase
     public async Task<ActionResult> DeleteAsync(Guid environment2DId)
     {
         var environment2D = await _environment2DRepository.SelectAsync(environment2DId);
-
-        if (environment2D == null)
-            return NotFound(new ProblemDetails { Detail = $"Environment2D {environment2DId} not found" });
+        if (environment2D == null) return NotFound(new ProblemDetails { Detail = $"Environment2D {environment2DId} not found" });
 
         await _environment2DRepository.DeleteAsync(environment2DId);
-
         return Ok();
     }
 }

@@ -49,11 +49,11 @@ builder.Services.AddTransient<IObject2DRepository, SqlObject2DRepository>(o => n
 
 var app = builder.Build();
 
-// ✅ NIEUW: Poort instellen voor Render configuratie, ALLEEN online!
+// ✅ GEFIXT: Poort instellen voor Render configuratie, nu met 0.0.0.0 voor binding!
 if (!app.Environment.IsDevelopment())
 {
     var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-    app.Urls.Add($"http://*:{port}");
+    app.Urls.Add($"http://0.0.0.0:{port}");
 }
 
 // Register OpenAPI/Swagger endpoints.

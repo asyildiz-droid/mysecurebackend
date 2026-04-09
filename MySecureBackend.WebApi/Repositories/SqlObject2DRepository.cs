@@ -17,7 +17,12 @@ namespace MySecureBackend.WebApi.Repositories
         public async Task InsertAsync(Object2D object2D)
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
-            await conn.ExecuteAsync("INSERT INTO \"Object2D\" (\"Id\", \"PrefabId\", \"PositionX\", \"PositionY\", \"ScaleX\", \"ScaleY\", \"RotationZ\", \"SortingLayer\") VALUES (@Id, @PrefabId, @PositionX, @PositionY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer)", object2D);
+
+            // Geforceerde Casts toegevoegd zodat DBeaver/Postgres nooit meer zeurt over "operator does not exist"
+            await conn.ExecuteAsync(
+                "INSERT INTO \"Object2D\" (\"Id\", \"PrefabId\", \"PositionX\", \"PositionY\", \"ScaleX\", \"ScaleY\", \"RotationZ\", \"SortingLayer\") " +
+                "VALUES (@Id, @PrefabId, CAST(@PositionX AS REAL), CAST(@PositionY AS REAL), CAST(@ScaleX AS REAL), CAST(@ScaleY AS REAL), CAST(@RotationZ AS REAL), CAST(@SortingLayer AS INTEGER))",
+                object2D);
         }
 
         public async Task<Object2D?> SelectAsync(Guid id)
@@ -35,15 +40,18 @@ namespace MySecureBackend.WebApi.Repositories
         public async Task UpdateAsync(Object2D object2D)
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
-            await conn.ExecuteAsync("UPDATE \"Object2D\" SET " +
-                                     "\"PrefabId\" = @PrefabId, " +
-                                     "\"PositionX\" = @PositionX, " +
-                                     "\"PositionY\" = @PositionY, " +
-                                     "\"ScaleX\" = @ScaleX, " +
-                                     "\"ScaleY\" = @ScaleY, " +
-                                     "\"RotationZ\" = @RotationZ, " +
-                                     "\"SortingLayer\" = @SortingLayer " +
-                                     "WHERE \"Id\" = @Id", object2D);
+
+            await conn.ExecuteAsync(
+                "UPDATE \"Object2D\" SET " +
+                "\"PrefabId\" = @PrefabId, " +
+                "\"PositionX\" = CAST(@PositionX AS REAL), " +
+                "\"PositionY\" = CAST(@PositionY AS REAL), " +
+                "\"ScaleX\" = CAST(@ScaleX AS REAL), " +
+                "\"ScaleY\" = CAST(@ScaleY AS REAL), " +
+                "\"RotationZ\" = CAST(@RotationZ AS REAL), " +
+                "\"SortingLayer\" = CAST(@SortingLayer AS INTEGER) " +
+                "WHERE \"Id\" = @Id",
+                object2D);
         }
 
         public async Task DeleteAsync(Guid id)

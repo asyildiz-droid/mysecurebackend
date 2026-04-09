@@ -38,22 +38,34 @@ public class Environment2DController : ControllerBase
     [HttpPost(Name = "AddEnvironment2D")]
     public async Task<ActionResult<Environment2D>> AddAsync(Environment2D environment2D)
     {
-        if (string.IsNullOrEmpty(environment2D.UserId))
-            return Unauthorized(new ProblemDetails { Detail = "Gebruiker niet meegegeven" });
+        try
+        {
+            if (string.IsNullOrEmpty(environment2D.UserId))
+                return Unauthorized(new ProblemDetails { Detail = "Gebruiker niet meegegeven" });
 
-        var userEnvironments = await _environment2DRepository.SelectByUserIdAsync(environment2D.UserId);
-        if (userEnvironments.Count() >= 5)
-            return BadRequest(new ProblemDetails { Detail = "Maximum aantal 2D-werelden bereikt" });
+            var userEnvironments = await _environment2DRepository.SelectByUserIdAsync(environment2D.UserId);
+            if (userEnvironments.Count() >= 5)
+                return BadRequest(new ProblemDetails { Detail = "Maximum aantal 2D-werelden bereikt" });
 
-        var existingEnvironment = await _environment2DRepository.SelectByUserIdAndNameAsync(environment2D.UserId, environment2D.Name);
-        if (existingEnvironment != null)
-            return Conflict(new ProblemDetails { Detail = "Naam bestaat al" });
+            var existingEnvironment = await _environment2DRepository.SelectByUserIdAndNameAsync(environment2D.UserId, environment2D.Name);
+            if (existingEnvironment != null)
+                return Conflict(new ProblemDetails { Detail = "Naam bestaat al" });
 
-        environment2D.Id = Guid.NewGuid();
+            // Geef een nieuw Uniek Id aan de Wereld.
+            environment2D.Id = Guid.NewGuid();
 
-        await _environment2DRepository.InsertAsync(environment2D);
+            await _environment2DRepository.InsertAsync(environment2D);
 
-        return CreatedAtRoute("GetEnvironment2DById", new { environment2DId = environment2D.Id }, environment2D);
+            return CreatedAtRoute("GetEnvironment2DById", new { environment2DId = environment2D.Id }, environment2D);
+        }
+        catch (Exception ex)
+        {
+            // Dit vangt de database-crash op en stuurt de EXACTE fout naar Unity / Swagger!
+            return StatusCode(500, new ProblemDetails
+            {
+                Detail = "Er ging iets mis tijdens opslaan in Database: " + ex.Message
+            });
+        }
     }
 
     [HttpPut("{environment2DId}", Name = "UpdateEnvironment2D")]

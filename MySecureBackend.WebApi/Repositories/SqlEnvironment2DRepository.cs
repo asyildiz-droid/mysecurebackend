@@ -17,7 +17,10 @@ namespace MySecureBackend.WebApi.Repositories
         public async Task InsertAsync(Environment2D environment2D)
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
-            await conn.ExecuteAsync("INSERT INTO \"Environment2D\" (\"Id\", \"Name\", \"MaxHeight\", \"MaxLength\", \"UserId\") VALUES (@Id, @Name, @MaxHeight, @MaxLength, @UserId)", environment2D);
+
+            // We casten "UserId" als integer voor DBeaver!
+            await conn.ExecuteAsync("INSERT INTO \"Environment2D\" (\"Id\", \"Name\", \"MaxHeight\", \"MaxLength\", \"UserId\") " +
+                "VALUES (@Id, @Name, @MaxHeight, @MaxLength, CAST(@UserId AS INTEGER))", environment2D);
         }
 
         public async Task<Environment2D?> SelectAsync(Guid id)
@@ -39,7 +42,7 @@ namespace MySecureBackend.WebApi.Repositories
                                      "\"Name\" = @Name, " +
                                      "\"MaxHeight\" = @MaxHeight, " +
                                      "\"MaxLength\" = @MaxLength, " +
-                                     "\"UserId\" = @UserId " +
+                                     "\"UserId\" = CAST(@UserId AS INTEGER) " +
                                      "WHERE \"Id\" = @Id", environment2D);
         }
 
@@ -53,7 +56,7 @@ namespace MySecureBackend.WebApi.Repositories
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
             return await conn.QueryAsync<Environment2D>(
-                "SELECT * FROM \"Environment2D\" WHERE \"UserId\" = @UserId",
+                "SELECT * FROM \"Environment2D\" WHERE \"UserId\" = CAST(@UserId AS INTEGER)",
                 new { UserId = userId });
         }
 
@@ -61,7 +64,7 @@ namespace MySecureBackend.WebApi.Repositories
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
             return await conn.QuerySingleOrDefaultAsync<Environment2D>(
-                "SELECT * FROM \"Environment2D\" WHERE \"UserId\" = @UserId AND \"Name\" = @Name",
+                "SELECT * FROM \"Environment2D\" WHERE \"UserId\" = CAST(@UserId AS INTEGER) AND \"Name\" = @Name",
                 new { UserId = userId, Name = name });
         }
     }

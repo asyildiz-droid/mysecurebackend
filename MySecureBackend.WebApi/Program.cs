@@ -52,7 +52,7 @@ builder.Services.AddSingleton<IUserRepository>(sp => new UserRepository(sqlConne
 builder.Services.AddTransient<IEnvironment2DRepository, SqlEnvironment2DRepository>(o => new SqlEnvironment2DRepository(sqlConnectionString!));
 builder.Services.AddTransient<IObject2DRepository, SqlObject2DRepository>(o => new SqlObject2DRepository(sqlConnectionString!));
 
-// NU BOULWEN WE PAS DE APP
+// NU BOUWEN WE PAS DE APP
 var app = builder.Build();
 
 // Register OpenAPI/Swagger endpoints.

@@ -18,10 +18,10 @@ namespace MySecureBackend.WebApi.Repositories
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
 
-            // Geforceerde Casts toegevoegd zodat DBeaver/Postgres nooit meer zeurt over "operator does not exist"
+            // ✅ GEFIXT: "Environment2DId" toegevoegd aan de Database Insert route!
             await conn.ExecuteAsync(
-                "INSERT INTO \"Object2D\" (\"Id\", \"PrefabId\", \"PositionX\", \"PositionY\", \"ScaleX\", \"ScaleY\", \"RotationZ\", \"SortingLayer\") " +
-                "VALUES (@Id, @PrefabId, CAST(@PositionX AS REAL), CAST(@PositionY AS REAL), CAST(@ScaleX AS REAL), CAST(@ScaleY AS REAL), CAST(@RotationZ AS REAL), CAST(@SortingLayer AS INTEGER))",
+                "INSERT INTO \"Object2D\" (\"Id\", \"Environment2DId\", \"PrefabId\", \"PositionX\", \"PositionY\", \"ScaleX\", \"ScaleY\", \"RotationZ\", \"SortingLayer\") " +
+                "VALUES (@Id, @Environment2DId, @PrefabId, CAST(@PositionX AS REAL), CAST(@PositionY AS REAL), CAST(@ScaleX AS REAL), CAST(@ScaleY AS REAL), CAST(@RotationZ AS REAL), CAST(@SortingLayer AS INTEGER))",
                 object2D);
         }
 
@@ -41,8 +41,10 @@ namespace MySecureBackend.WebApi.Repositories
         {
             using var conn = new NpgsqlConnection(sqlConnectionString);
 
+            // ✅ GEFIXT: "Environment2DId" toegevoegd aan the Update route!
             await conn.ExecuteAsync(
                 "UPDATE \"Object2D\" SET " +
+                "\"Environment2DId\" = @Environment2DId, " +
                 "\"PrefabId\" = @PrefabId, " +
                 "\"PositionX\" = CAST(@PositionX AS REAL), " +
                 "\"PositionY\" = CAST(@PositionY AS REAL), " +

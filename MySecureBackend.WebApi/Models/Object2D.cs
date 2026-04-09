@@ -4,7 +4,9 @@
     {
         public Guid Id { get; set; }
 
-        public string PrefabId { get; set; } 
+        public Guid Environment2DId { get; set; } // ✅ DEZE ONTBRACK! Nu weet the DB bij welke wereld hij hoort.
+
+        public string PrefabId { get; set; }
 
         public float PositionX { get; set; }
 

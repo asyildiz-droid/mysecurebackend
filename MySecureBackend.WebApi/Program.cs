@@ -5,6 +5,11 @@ using MySecureBackend.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Dwing de poort af vóórdat er ook maar IETS anders gebouwd wordt.
+// Dit voorkomt dat Render een "Port scan timeout" foutmelding geeft.
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 // Register MVC controllers for handling HTTP requests.
 builder.Services.AddControllers();
 
@@ -47,14 +52,8 @@ builder.Services.AddSingleton<IUserRepository>(sp => new UserRepository(sqlConne
 builder.Services.AddTransient<IEnvironment2DRepository, SqlEnvironment2DRepository>(o => new SqlEnvironment2DRepository(sqlConnectionString!));
 builder.Services.AddTransient<IObject2DRepository, SqlObject2DRepository>(o => new SqlObject2DRepository(sqlConnectionString!));
 
+// NU BOULWEN WE PAS DE APP
 var app = builder.Build();
-
-// ✅ GEFIXT: Poort instellen voor Render configuratie, nu met 0.0.0.0 voor binding!
-if (!app.Environment.IsDevelopment())
-{
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-    app.Urls.Add($"http://0.0.0.0:{port}");
-}
 
 // Register OpenAPI/Swagger endpoints.
 if (app.Environment.IsDevelopment())

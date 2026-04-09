@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MySecureBackend.WebApi.Interface;
 using MySecureBackend.WebApi.Models;
 
@@ -38,10 +38,18 @@ public class Object2DController : ControllerBase
     [HttpPost(Name = "AddObject2D")]
     public async Task<ActionResult<Object2D>> AddAsync(Object2D object2D)
     {
-        object2D.Id = Guid.NewGuid();
-        await _object2DRepository.InsertAsync(object2D);
+        // ✅ GEFIXT: The error the The the bij het the object the!
+        try
+        {
+            object2D.Id = Guid.NewGuid();
+            await _object2DRepository.InsertAsync(object2D);
 
-        return CreatedAtRoute("GetObject2DById", new { object2DId = object2D.Id }, object2D);
+            return CreatedAtRoute("GetObject2DById", new { object2DId = object2D.Id }, object2D);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ProblemDetails { Detail = "Er ging iets mis tijdens The Database Opslaan: " + ex.Message });
+        }
     }
 
     [HttpPut("{object2DId}", Name = "UpdateObject2D")]

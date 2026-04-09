@@ -74,7 +74,8 @@ else
     var buildTimeStamp = System.IO.File.GetCreationTime(System.Reflection.Assembly.GetExecutingAssembly().Location);
     string currentHealthMessage = $"The API is up 🚀 | Connection string found: {(sqlConnectionStringFound ? "✅" : "❌")} | Build timestamp: {buildTimeStamp}";
 
-    app.MapGet("/", () => currentHealthMessage);
+    // ✅ GEFIXT: Map in plaats van MapGet (voorkomt 405 the The The)
+    app.Map("/", () => currentHealthMessage);
 }
 
 // ✅ NIEUW: CORS middleware

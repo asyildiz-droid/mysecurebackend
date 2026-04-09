@@ -6,9 +6,12 @@ using MySecureBackend.WebApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Dwing de poort af vóórdat er ook maar IETS anders gebouwd wordt.
-// Dit voorkomt dat Render een "Port scan timeout" foutmelding geeft.
-var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-builder.WebHost.UseUrls($"http://*:{port}");
+// ✅ GEFIXT: Gebruik deze truc ALLEEN the productie! Lokaal laat Visual Studio het met rust.
+if (!builder.Environment.IsDevelopment())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
 
 // Register MVC controllers for handling HTTP requests.
 builder.Services.AddControllers();
@@ -74,7 +77,7 @@ else
     var buildTimeStamp = System.IO.File.GetCreationTime(System.Reflection.Assembly.GetExecutingAssembly().Location);
     string currentHealthMessage = $"The API is up 🚀 | Connection string found: {(sqlConnectionStringFound ? "✅" : "❌")} | Build timestamp: {buildTimeStamp}";
 
-    // ✅ GEFIXT: Map in plaats van MapGet (voorkomt 405 the The The)
+    // ✅ GEFIXT: Map in plaats van MapGet (voorkomt 405 Method Not Supported op de Render HealthCheck)
     app.Map("/", () => currentHealthMessage);
 }
 

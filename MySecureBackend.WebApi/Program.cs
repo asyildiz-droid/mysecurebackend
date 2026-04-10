@@ -3,24 +3,20 @@ using MySecureBackend.WebApi.Interface;
 using MySecureBackend.WebApi.Repositories;
 using MySecureBackend.WebApi.Services;
 
-// The de Builder! We The THE poort direct the via Kestrel options.
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ GEFIXT: Dit the Render's Port Scan The the the direct!
+// ✅ FIX VOOR RENDER DEMO: Forceer expliciet IPv4 IP-adres (0.0.0.0) 
+// Hierdoor zal Render's ping hem altijd kunnen vinden!
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(int.Parse(port)); // De absolute strakste manier in .NET!
-});
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // Register MVC controllers for handling HTTP requests.
 builder.Services.AddControllers();
 
 // Retrieve the SQL connection string from configuration.
 var sqlConnectionString = builder.Configuration.GetValue<string>("SqlConnectionString");
-var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString);
 
-// ✅ NIEUW: CORS toevoegen voor Unity
+// CORS toevoegen voor Unity
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowUnity", policy =>
@@ -62,22 +58,15 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "MySecureBackend API v1");
         options.RoutePrefix = "swagger";
-        options.CacheLifetime = TimeSpan.Zero;
-
-        if (!sqlConnectionStringFound)
-            options.HeadContent = "<h1 align=\"center\">❌ SqlConnectionString not found ❌</h1>";
     });
 }
 else
 {
-    var buildTimeStamp = System.IO.File.GetCreationTime(System.Reflection.Assembly.GetExecutingAssembly().Location);
-    string currentHealthMessage = $"The API is up 🚀 | Connection string found: {(sqlConnectionStringFound ? "✅" : "❌")} | Build timestamp: {buildTimeStamp}";
-
-    // ✅ GEFIXT: Map endpoint the ook The the the de Render Health check The!
-    app.Map("/", () => currentHealthMessage);
+    // ✅ GEFIXT: MapGet EN MapMethods(HEAD) zorgen dat Render de API ping 100% succesvol doorkrijgt
+    app.MapGet("/", () => "API is Live! 🚀");
+    app.MapMethods("/", new[] { "HEAD" }, () => "API is Live! 🚀");
 }
 
-// ✅ NIEUW: CORS middleware
 app.UseCors("AllowUnity");
 app.UseHttpsRedirection();
 app.UseAuthorization();
